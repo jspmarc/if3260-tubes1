@@ -13,7 +13,6 @@ function drawScene(gl, programInfo, buffers, isLine, rotation) {
   gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
 
   // Clear the canvas before we start drawing on it.
-
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   // Create a perspective matrix, a special matrix that is
@@ -22,7 +21,6 @@ function drawScene(gl, programInfo, buffers, isLine, rotation) {
   // ratio that matches the display size of the canvas
   // and we only want to see objects between 0.1 units
   // and 100 units away from the camera.
-
   const fieldOfView = 45 * Math.PI / 180;   // in radians
   const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
   const zNear = 0.1;
@@ -43,7 +41,6 @@ function drawScene(gl, programInfo, buffers, isLine, rotation) {
 
   // Now move the drawing position a bit to where we want to
   // start drawing the square.
-
   mat4.translate(modelViewMatrix,     // destination matrix
                 modelViewMatrix,     // matrix to translate
                 [-0.0, 0.0, -6.0]);  // amount to translate

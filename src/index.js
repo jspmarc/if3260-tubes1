@@ -3,6 +3,7 @@ var programInfo;
 
 var reset = false;
 var line = false;
+const model = new Model();
 
 main();
 
@@ -14,14 +15,12 @@ function main() {
   gl = canvas.getContext('webgl');
 
   // If we don't have a GL context, give up now
-
   if (!gl) {
     alert('Unable to initialize WebGL. Your browser or machine may not support it.');
     return;
   }
 
   // Vertex shader program
-
   const vsSource = `
     attribute vec4 aVertexPosition;
     attribute vec4 aVertexColor;
@@ -35,7 +34,6 @@ function main() {
   `;
 
   // Fragment shader program
-
   const fsSource = `
     varying lowp vec4 vColor;
     void main(void) {
@@ -64,31 +62,30 @@ function main() {
   };
 
   // Add points to the model
-  Model.addPoint(1.0, 1.0, [1.0, 1.0, 1.0, 1.0]);
-  Model.addPoint(-1.0, 1.0, [1.0, 0.0, 0.0, 1.0]);
-  Model.addPoint(1.0, -1.0, [0.0, 1.0, 0.0, 1.0]);
-  Model.addPoint(-1.0, -1.0, [0.0, 0.0, 1.0, 1.0]);
+  model.addPoint(1.0, 1.0, [1.0, 1.0, 1.0, 1.0]);
+  model.addPoint(-1.0, 1.0, [1.0, 0.0, 0.0, 1.0]);
+  model.addPoint(1.0, -1.0, [0.0, 1.0, 0.0, 1.0]);
+  model.addPoint(-1.0, -1.0, [0.0, 0.0, 1.0, 1.0]);
 
   // Render model
-  Model.render(gl, programInfo, false);
+  model.render(gl, programInfo, false);
 }
 
 function modifyPoint() {
-  reset ? Model.changePoint(0, 1, 1) : Model.changePoint(0, 2, 2, null);
-
+  reset ? model.changePoint(0, 1, 1) : model.changePoint(0, 2, 2, null);
   reset = !reset;
 
-  Model.render(gl, programInfo, line);
+  model.render(gl, programInfo, line);
 }
 
 function rotateModel() {
-  Model.rotate(Math.PI/4);
+  model.rotate(Math.PI/4);
 
-  Model.render(gl, programInfo, line);
+  model.render(gl, programInfo, line);
 }
 
 function drawLine() {
   line = !line;
 
-  Model.render(gl, programInfo, line);
+  model.render(gl, programInfo, line);
 }
