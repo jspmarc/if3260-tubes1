@@ -1,7 +1,9 @@
+var indices = [];
+
 class Model {
-  #positions = [];
+  #coordinates = [];
   #colors = [];
-  #rotation = 0;
+  #type = "SQUARE";
 
   constructor() {}
 
@@ -12,8 +14,10 @@ class Model {
    * @param {Array<number>} color 
    */
   addPoint(x, y, color) {
-    this.#positions.push([x,y]);
-    this.#colors.push(color)
+    this.#coordinates.push([x,y,0]);
+    this.#colors.push(color);
+
+    indices.push(indices.length);
   }
 
   /**
@@ -25,53 +29,63 @@ class Model {
    * @returns 
    */
   changePoint(idx, newX, newY, newColor){
-    var [curX, curY] = this.#positions[idx];
-    this.#positions[idx] = [newX ?? curX, newY ?? curY];
+    var [curX, curY] = this.#coordinates[idx];
+    this.#coordinates[idx] = [newX ?? curX, newY ?? curY, 0];
     this.#colors[idx] = newColor ?? this.#colors[idx];
   }
 
   /**
-   * Rotate the model
-   * @param {number} rotation 
-   * @returns 
+   * Remove point
+   * @param {number} idx 
    */
-  rotate(rotation) {
-    this.#rotation += rotation;
+  deletePoint(idx) {
+    this.#coordinates.splice(idx, 1);
+    this.#colors.splice(idx, 1);
+    indices.pop()
   }
 
   /**
-   * Create a buffer for the model.
-   * @param {WebGLRenderingContextBase} gl
+   * Reset model
+   * @param {number} index 
+   */
+  reset() {
+    indices.splice(this.#coordinates.length * -1);
+    this.#coordinates = [];
+    this.#colors = [];
+  }
+
+  /**
+   * Change model type
+   * @param {String} type 
+   */
+  changeType(type) {
+    this.#type = type;
+  }
+
+  /**
+   * Get model type
+   * @returns {String}
+   */
+  getModelType() {
+    return this.#type;
+  }
+
+  /**
+   * Get model total indices
+   * @returns {number}
+   */
+  getTotalIndices() {
+    return this.#coordinates.length;
+  }
+
+  /**
+   * Get model info
    * @returns 
    */
-  getBuffer(gl) { 
-    const positionBuffer = gl.createBuffer();
-  
-    // Select the positionBuffer as the one to apply buffer
-    // operations to from here out.
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([].concat(...this.#positions)), gl.STATIC_DRAW);
-  
-    // Now pass the list of positions into WebGL to build the
-    // shape. We do this by creating a Float32Array from the
-    // JavaScript array, then use it to fill the current buffer.
-    const colorBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([].concat(...this.#colors)), gl.STATIC_DRAW);
-  
+  getModelInfo(){
     return {
-      position: positionBuffer,
-      color: colorBuffer,
-    };
-  }
-
-  /**
-   * Render Model into canvas
-   * @param {WebGLRenderingContextBase} gl 
-   * @param {Object} programInfo
-   * @param {boolean} isLine 
-   */
-  render(gl, programInfo, isLine){
-    drawScene(gl, programInfo, this.getBuffer(gl), isLine, this.#rotation);
+      coordinates: [].concat(...this.#coordinates),
+      colors: [].concat(...this.#colors),
+    }
   }
 }

@@ -1,8 +1,9 @@
 var gl;
-var programInfo;
+var shaderProgram;
 
 var reset = false;
 var line = false;
+var modelArr = [];
 const model = new Model();
 
 main();
@@ -14,6 +15,11 @@ function main() {
   const canvas = document.querySelector('#glcanvas');
   gl = canvas.getContext('webgl');
 
+  gl.clearColor(0.95, 0.90, 0.85, 0.9);
+  gl.enable(gl.DEPTH_TEST);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.viewport(0, 0, canvas.width, canvas.height);
+
   // If we don't have a GL context, give up now
   if (!gl) {
     alert('Unable to initialize WebGL. Your browser or machine may not support it.');
@@ -21,71 +27,64 @@ function main() {
   }
 
   // Vertex shader program
-  const vsSource = `
-    attribute vec4 aVertexPosition;
-    attribute vec4 aVertexColor;
-    uniform mat4 uModelViewMatrix;
-    uniform mat4 uProjectionMatrix;
-    varying lowp vec4 vColor;
+  const vsSource = `attribute vec3 coordinates;
+    attribute vec3 color;
+    varying vec3 vColor;
     void main(void) {
-      gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-      vColor = aVertexColor;
-    }
-  `;
+        gl_Position = vec4(coordinates, 1.0);
+        vColor = color;
+  }`;
 
   // Fragment shader program
-  const fsSource = `
-    varying lowp vec4 vColor;
+  const fsSource = `precision mediump float;
+    varying vec3 vColor;
     void main(void) {
-      gl_FragColor = vColor;
-    }
-  `;
+    gl_FragColor = vec4(vColor, 1.);
+  }`;
 
   // Initialize a shader program; this is where all the lighting
   // for the vertices and so forth is established.
-  const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
-
-  // Collect all the info needed to use the shader program.
-  // Look up which attributes our shader program is using
-  // for aVertexPosition, aVertexColor and also
-  // look up uniform locations.
-  programInfo = {
-    program: shaderProgram,
-    attribLocations: {
-      vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
-      vertexColor: gl.getAttribLocation(shaderProgram, 'aVertexColor'),
-    },
-    uniformLocations: {
-      projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
-      modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
-    },
-  };
+  shaderProgram = initShaderProgram(gl, vsSource, fsSource);
 
   // Add points to the model
-  model.addPoint(1.0, 1.0, [1.0, 1.0, 1.0, 1.0]);
-  model.addPoint(-1.0, 1.0, [1.0, 0.0, 0.0, 1.0]);
-  model.addPoint(1.0, -1.0, [0.0, 1.0, 0.0, 1.0]);
-  model.addPoint(-1.0, -1.0, [0.0, 0.0, 1.0, 1.0]);
+  model.addPoint(0.0, 0.0, [1.0, 1.0, 0.0]);
+  model.addPoint(0.0, 1.0, [1.0, 0.0, 0.0]);
+  model.addPoint(1.0, 1.0, [0.0, 1.0, 0.0]);
+  model.addPoint(1.0, 0.0, [0.0, 0.0, 1.0]);
+  modelArr.push(model);
 
   // Render model
-  model.render(gl, programInfo, false);
+  renderProgram(gl, shaderProgram, modelArr)
 }
 
 function modifyPoint() {
-  reset ? model.changePoint(0, 1, 1) : model.changePoint(0, 2, 2, null);
+  reset ? model.changePoint(0, 0, 0) : model.changePoint(0, 0.2, 0.2);
   reset = !reset;
 
-  model.render(gl, programInfo, line);
-}
-
-function rotateModel() {
-  model.rotate(Math.PI/4);
-
-  model.render(gl, programInfo, line);
+  renderProgram(gl, shaderProgram, modelArr)
 }
 
 function drawLine() {
   line = !line;
+  model.changeType(line ? 'LINE' : 'SQUARE')
 
-  model.render(gl, programInfo, line);
+  renderProgram(gl, shaderProgram, modelArr)
+}
+
+function removeAPoint(idx) {
+  model.deletePoint(idx);
+
+  renderProgram(gl, shaderProgram, modelArr)
+}
+
+function addNewModel() {
+  const model2 = new Model();
+  
+  model2.addPoint(-1, -1, [1.0, 0, 0]);
+  model2.addPoint(0, 0, [1.0, 0.0, 0.0]);
+  model2.addPoint(0, -1.0, [1.0, 0.0, 0.0]);
+
+  modelArr.push(model2);
+
+  renderProgram(gl, shaderProgram, modelArr);
 }

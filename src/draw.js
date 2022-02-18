@@ -1,113 +1,104 @@
 /**
- * Draw the canvas
- * @param {WebGLRenderingContextBase} gl 
- * @param {Object} programInfo 
- * @param {Object} buffers 
- * @param {boolean} isLine 
- * @param {number} rotation 
+ * Create a buffer for the model.
+ * @param {WebGLRenderingContextBase} gl
+ * @returns 
  */
-function drawScene(gl, programInfo, buffers, isLine, rotation) {
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
-  gl.clearDepth(1.0);                 // Clear everything
-  gl.enable(gl.DEPTH_TEST);           // Enable depth testing
-  gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
+function initBuffer(gl, positions, colors, indices) { 
+    
+  const indexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
 
+  const positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER, null)
+
+  const colorBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER, null)
+
+  return {
+    coorBuffer: positionBuffer,
+    colorBuffer: colorBuffer,
+    indicesBuffer: indexBuffer,
+  };
+}
+
+/**
+ * Bind coordinates and indices buffer
+ * @param {WebGLRenderingContextBase} gl 
+ * @param {WebGLProgram} shaderProgram 
+ * @param {WebGLBuffer} coorBuffer 
+ * @param {WebGLBuffer} indicesBuffer 
+ */
+function bindCoordinatesBuffer(gl, shaderProgram, coorBuffer, indicesBuffer) {
+  gl.bindBuffer(gl.ARRAY_BUFFER, coorBuffer);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer);
+  
+  coorAttrib = gl.getAttribLocation(shaderProgram, 'coordinates')
+  gl.vertexAttribPointer(coorAttrib, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(coorAttrib);
+}
+
+/**
+ * Bind color buffer
+ * @param {WebGLRenderingContextBase} gl 
+ * @param {WebGLProgram} shaderProgram 
+ * @param {WebGLBuffer} colorBuffer 
+ */
+function bindColorBuffer(gl, shaderProgram, colorBuffer) {
+  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+
+  colorAttrib = gl.getAttribLocation(shaderProgram, 'color')
+  gl.vertexAttribPointer(colorAttrib, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(colorAttrib);
+}
+
+/**
+ * Render all models
+ * @param {WebGLRenderingContextBase} gl 
+ * @param {WebGLProgram} shaderProgram 
+ * @param {Array<Model>} models 
+ */
+function renderProgram(gl, shaderProgram, models) {
+  var coordinatesArr = [];
+  var colorsArr = [];
+
+  gl.useProgram(shaderProgram);
+  
   // Clear the canvas before we start drawing on it.
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  // Create a perspective matrix, a special matrix that is
-  // used to simulate the distortion of perspective in a camera.
-  // Our field of view is 45 degrees, with a width/height
-  // ratio that matches the display size of the canvas
-  // and we only want to see objects between 0.1 units
-  // and 100 units away from the camera.
-  const fieldOfView = 45 * Math.PI / 180;   // in radians
-  const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-  const zNear = 0.1;
-  const zFar = 100.0;
-  const projectionMatrix = mat4.create();
+  models.forEach(model => {
+    var { coordinates, colors } = model.getModelInfo();
 
-  // note: glmatrix.js always has the first argument
-  // as the destination to receive the result.
-  mat4.perspective(projectionMatrix,
-                   fieldOfView,
-                   aspect,
-                   zNear,
-                   zFar);
+    coordinatesArr = coordinatesArr.concat(coordinates);
+    colorsArr = colorsArr.concat(colors);
+  });
 
-  // Set the drawing position to the "identity" point, which is
-  // the center of the scene.
-  const modelViewMatrix = mat4.create();
+  var { coorBuffer, colorBuffer, indicesBuffer } = initBuffer(gl, coordinatesArr, colorsArr, indices);
 
-  // Now move the drawing position a bit to where we want to
-  // start drawing the square.
-  mat4.translate(modelViewMatrix,     // destination matrix
-                modelViewMatrix,     // matrix to translate
-                [-0.0, 0.0, -6.0]);  // amount to translate
-
-  mat4.rotate(modelViewMatrix,  // destination matrix
-              modelViewMatrix,  // matrix to rotate
-              rotation,   // amount to rotate in radians
-              [0, 0, 1]);       // axis to rotate around
-
-  // Tell WebGL how to pull out the positions from the position
-  // buffer into the vertexPosition attribute
-  {
-    const numComponents = 2;
-    const type = gl.FLOAT;
-    const normalize = false;
-    const stride = 0;
-    const offset = 0;
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-    gl.vertexAttribPointer(
-        programInfo.attribLocations.vertexPosition,
-        numComponents,
-        type,
-        normalize,
-        stride,
-        offset);
-    gl.enableVertexAttribArray(
-        programInfo.attribLocations.vertexPosition);
-  }
-
-  // Tell WebGL how to pull out the colors from the color buffer
-  // into the vertexColor attribute.
-  {
-    const numComponents = 4;
-    const type = gl.FLOAT;
-    const normalize = false;
-    const stride = 0;
-    const offset = 0;
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
-    gl.vertexAttribPointer(
-        programInfo.attribLocations.vertexColor,
-        numComponents,
-        type,
-        normalize,
-        stride,
-        offset);
-    gl.enableVertexAttribArray(
-        programInfo.attribLocations.vertexColor);
-  }
-
+  bindCoordinatesBuffer(gl, shaderProgram, coorBuffer, indicesBuffer);
+  
+  bindColorBuffer(gl, shaderProgram, colorBuffer);
+  
   // Tell WebGL to use our program when drawing
+  gl.enable(gl.DEPTH_TEST);
+  gl.clear(gl.COLOR_BUFFER_BIT);
 
-  gl.useProgram(programInfo.program);
+  var offset = 0;
+  models.forEach(model => {
+    var totalIndices = model.getTotalIndices();
 
-  // Set the shader uniforms
+    if (model.getModelType() === 'LINE') {
+      gl.drawElements(gl.LINE_LOOP, totalIndices, gl.UNSIGNED_SHORT, 2 * offset);
+    } else {
+      gl.drawElements(gl.TRIANGLE_FAN, totalIndices, gl.UNSIGNED_SHORT, 2 * offset);
+    }
 
-  gl.uniformMatrix4fv(
-      programInfo.uniformLocations.projectionMatrix,
-      false,
-      projectionMatrix);
-  gl.uniformMatrix4fv(
-      programInfo.uniformLocations.modelViewMatrix,
-      false,
-      modelViewMatrix);
-
-  {
-    const offset = 0;
-    const vertexCount = 4;
-    gl.drawArrays(isLine ? gl.LINE_LOOP : gl.TRIANGLE_STRIP, offset, vertexCount);
-  }
+    offset += totalIndices;
+  });
 }
