@@ -8,6 +8,8 @@ const model = new Model();
 
 main();
 
+document.getElementById('obj-color-picker').addEventListener('change', colorChangeListener);
+
 //
 // Start here
 //
@@ -47,44 +49,13 @@ function main() {
   shaderProgram = initShaderProgram(gl, vsSource, fsSource);
 
   // Add points to the model
-  model.addPoint(0.0, 0.0, [1.0, 1.0, 0.0]);
-  model.addPoint(0.0, 1.0, [1.0, 0.0, 0.0]);
-  model.addPoint(1.0, 1.0, [0.0, 1.0, 0.0]);
-  model.addPoint(1.0, 0.0, [0.0, 0.0, 1.0]);
+  model.addPoint(0.0, 0.0);
+  model.addPoint(0.0, 1.0);
+  model.addPoint(1.0, 1.0);
+  model.addPoint(1.0, 0.0);
   modelArr.push(model);
 
   // Render model
   renderProgram(gl, shaderProgram, modelArr)
 }
 
-function modifyPoint() {
-  reset ? model.changePoint(0, 0, 0) : model.changePoint(0, 0.2, 0.2);
-  reset = !reset;
-
-  renderProgram(gl, shaderProgram, modelArr)
-}
-
-function drawLine() {
-  line = !line;
-  model.changeType(line ? 'LINE' : 'SQUARE')
-
-  renderProgram(gl, shaderProgram, modelArr)
-}
-
-function removeAPoint(idx) {
-  model.deletePoint(idx);
-
-  renderProgram(gl, shaderProgram, modelArr)
-}
-
-function addNewModel() {
-  const model2 = new Model();
-  
-  model2.addPoint(-1, -1, [1.0, 0, 0]);
-  model2.addPoint(0, 0, [1.0, 0.0, 0.0]);
-  model2.addPoint(0, -1.0, [1.0, 0.0, 0.0]);
-
-  modelArr.push(model2);
-
-  renderProgram(gl, shaderProgram, modelArr);
-}

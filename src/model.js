@@ -5,7 +5,9 @@ class Model {
   #colors = [];
   #type = "SQUARE";
 
-  constructor() {}
+  constructor(type="SQUARE") {
+    this.#type = type;
+  }
 
   /**
    * Add a point to the model
@@ -13,7 +15,7 @@ class Model {
    * @param {number} y 
    * @param {Array<number>} color 
    */
-  addPoint(x, y, color) {
+  addPoint(x, y, color=[0,0,0]) {
     this.#coordinates.push([x,y,0]);
     this.#colors.push(color);
 
@@ -86,6 +88,15 @@ class Model {
     return {
       coordinates: [].concat(...this.#coordinates),
       colors: [].concat(...this.#colors),
+    }
+  }
+
+  /**
+   * @param {Array<number>} newColor 
+   */
+  changeColor(newColor) {
+    for (let i = 0; i < this.#colors.length; ++i) {
+      this.#colors[i] = newColor;
     }
   }
 }
