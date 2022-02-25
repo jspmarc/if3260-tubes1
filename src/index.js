@@ -15,6 +15,11 @@ document.getElementById('obj-color-picker').addEventListener('change', colorChan
 //
 function main() {
   const canvas = document.querySelector('#glcanvas');
+  // Change here to resize canvas
+  canvas.style.width ='100%';
+  canvas.style.height='100%';
+  canvas.width  = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
   gl = canvas.getContext('webgl');
 
   gl.clearColor(0.95, 0.90, 0.85, 0.9);
@@ -58,4 +63,10 @@ function main() {
   // Render model
   renderProgram(gl, shaderProgram, modelArr)
 }
+
+function printMousePos(event) {
+  console.log("clientX: " + event.clientX + " - clientY: " + event.clientY);
+}
+
+document.getElementById("glcanvas").addEventListener("click", printMousePos);
 
