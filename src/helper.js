@@ -1,3 +1,5 @@
+var drawMode = '';
+
 function modifyPoint() {
   reset ? model.changePoint(0, 0, 0) : model.changePoint(0, 0.2, 0.2);
   reset = !reset;
@@ -5,9 +7,28 @@ function modifyPoint() {
   renderProgram(gl, shaderProgram, modelArr)
 }
 
-function drawLine() {
+function drawLine(e) {
+  line = !line;
+  // model.changeType(line ? 'LINE' : 'SQUARE')
+  document.getElementById('glcanvas').classList.add('cursor-draw');
+  selectDrawTool = true;
+  drawMode = 'line';
+
+  renderProgram(gl, shaderProgram, modelArr)
+}
+
+function drawRectangle(e) {
   line = !line;
   model.changeType(line ? 'LINE' : 'SQUARE')
+  printMousePos(e);
+
+  renderProgram(gl, shaderProgram, modelArr)
+}
+
+function drawPolygon(e) {
+  line = !line;
+  model.changeType(line ? 'LINE' : 'SQUARE')
+  printMousePos(e);
 
   renderProgram(gl, shaderProgram, modelArr)
 }
@@ -50,4 +71,27 @@ function colorChangeListener(e) {
   modelArr.forEach(model => model.changeColor(newColor));
 
   renderProgram(gl, shaderProgram, modelArr);
+}
+
+/**
+ * @param {Event} e an event on the canvas HTML object
+* @returns {{x: number, y: number}} 
+ */
+function getGlCoordinates(e) {
+  const canvas = e.target;
+  const rect = canvas.getBoundingClientRect();
+  const scale = {
+    x: canvas.width / rect.width,
+    y: canvas.height / rect.height,
+  }
+  const pos = {
+    x: (e.clientX - rect.left) * scale.x,
+    y: (e.clientY - rect.top) * scale.y,
+  }
+  const coor = {
+    x : pos.x / gl.canvas.width  *  2 - 1,
+    y : pos.y / gl.canvas.height * -2 + 1,
+  };
+
+  return coor;
 }

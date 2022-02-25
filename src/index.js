@@ -4,11 +4,12 @@ var shaderProgram;
 var reset = false;
 var line = false;
 var modelArr = [];
-const model = new Model();
+var isDrawing = false;
 
 main();
 
 document.getElementById('obj-color-picker').addEventListener('change', colorChangeListener);
+document.querySelector('.tools-pane > .line').addEventListener('click', drawLine);
 
 //
 // Start here
@@ -53,13 +54,6 @@ function main() {
   // for the vertices and so forth is established.
   shaderProgram = initShaderProgram(gl, vsSource, fsSource);
 
-  // Add points to the model
-  model.addPoint(0.0, 0.0);
-  model.addPoint(0.0, 1.0);
-  model.addPoint(1.0, 1.0);
-  model.addPoint(1.0, 0.0);
-  modelArr.push(model);
-
   // Render model
   renderProgram(gl, shaderProgram, modelArr)
 }
@@ -68,5 +62,61 @@ function printMousePos(event) {
   console.log("clientX: " + event.clientX + " - clientY: " + event.clientY);
 }
 
-document.getElementById("glcanvas").addEventListener("click", printMousePos);
+function startDrawing(e) {
+  if (drawMode !== '') {
+    isDrawing = true;
+    const color = hexToColorArray(document.getElementById('obj-color-picker').value);
+
+    const model = new Model(drawMode.toUpperCase());
+    modelArr.push(model);
+    const coor = getGlCoordinates(e);
+    switch (drawMode) {
+      case 'line':
+        model.addPoint(coor.x, coor.y, color);
+    }
+    renderProgram(gl, shaderProgram, modelArr);
+  }
+}
+
+function drawing(e) {
+  if (isDrawing) {
+    const model = modelArr[modelArr.length - 1];
+    const coor = getGlCoordinates(e);
+    switch (drawMode) {
+      case 'line':
+        while (model.getCoordinates().length >= 2) {
+          model.popPoint();
+        }
+        model.addPoint(coor.x, coor.y);
+    }
+    renderProgram(gl, shaderProgram, modelArr);
+  }
+}
+
+function finishDrawing(e) {
+  if (isDrawing) {
+    const color = hexToColorArray(document.getElementById('obj-color-picker').value);
+    const model = modelArr[modelArr.length - 1];
+    const coor = getGlCoordinates(e);
+    switch (drawMode) {
+      case 'line':
+        while (model.getCoordinates().length >= 2) {
+          model.popPoint();
+        }
+        model.addPoint(coor.x, coor.y, color);
+    }
+
+    document.getElementById('glcanvas').classList.remove('cursor-draw');
+    drawMode = ''
+
+    console.log(model);
+    renderProgram(gl, shaderProgram, modelArr);
+  }
+  isDrawing = false;
+}
+
+// document.getElementById("glcanvas").addEventListener("click", printMousePos);
+document.getElementById("glcanvas").addEventListener("mousedown", startDrawing);
+document.getElementById("glcanvas").addEventListener("mousemove", drawing);
+document.getElementById("glcanvas").addEventListener("mouseup", finishDrawing);
 

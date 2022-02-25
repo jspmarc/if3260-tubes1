@@ -46,6 +46,12 @@ class Model {
     indices.pop()
   }
 
+  popPoint() {
+    this.#coordinates.pop();
+    this.#colors.pop();
+    indices.pop();
+  }
+
   /**
    * Reset model
    * @param {number} index 
@@ -78,6 +84,15 @@ class Model {
    */
   getTotalIndices() {
     return this.#coordinates.length;
+  }
+
+
+  /**
+   * Get model coordinates
+   * @returns {number}
+   */
+  getCoordinates() {
+    return this.#coordinates;
   }
 
   /**
