@@ -9,7 +9,7 @@ var isShiftHeld = false;
 
 main();
 
-document.getElementById("glcanvas").addEventListener("click", printMousePos);
+// document.getElementById("glcanvas").addEventListener("click", printMousePos);
 document.getElementById("glcanvas").addEventListener("mousedown", startDrawing);
 document.getElementById("glcanvas").addEventListener("mousemove", drawing);
 document.getElementById("glcanvas").addEventListener("mouseup", finishDrawing);
@@ -157,21 +157,24 @@ function finishDrawing(e) {
     drawMode = ''
 
     renderProgram(gl, shaderProgram, modelArr);
-    console.log(model);
 
     // add entry to models pane
     const pane = document.querySelector('.right.models-pane');
     const ul = document.createElement('ul');
     const li1 = document.createElement('li');
     const li2 = document.createElement('li');
+    const li3 = document.createElement('li');
     const colorInput = document.createElement('input');
     const colorLabel = document.createElement('label');
+    const deleteButton = document.createElement('button');
 
     li1.innerHTML = `type: ${model.getModelType()}`;
     li2.appendChild(colorLabel);
     li2.appendChild(colorInput);
+    li3.appendChild(deleteButton);
     ul.appendChild(li1);
     ul.appendChild(li2);
+    ul.appendChild(li3);
     pane.appendChild(ul);
 
     colorInput.type = 'color';
@@ -186,7 +189,16 @@ function finishDrawing(e) {
     });
 
     colorLabel.htmlFor = colorInput.name;
-    colorLabel.innerHTML = 'color: '
+    colorLabel.innerHTML = 'color: ';
+
+    deleteButton.innerHTML = 'delete';
+    deleteButton.id = `model-delete-${modelArr.length}`
+    deleteButton.addEventListener('click', () => {
+      pane.removeChild(ul);
+      const idx = modelArr.indexOf(model);
+      modelArr.splice(idx, 1);
+      renderProgram(gl, shaderProgram, modelArr);
+    });
   }
   isDrawing = false;
 }
