@@ -53,3 +53,20 @@ function getCursorGlCoordinates(e) {
 
   return coor;
 }
+
+/**
+ * Draw STEI Logo using WebGL
+ */
+function drawSTEILogo() {
+  ModelData.forEach(model => {
+    const modelObj = new Model();
+    model.coordinates.forEach(coordinate => {
+      modelObj.addPoint(coordinate[0], coordinate[1]);
+    })
+    modelObj.changeColor(model.colorRaw);
+    modelObj.addToModelsPane();
+    modelArr.push(modelObj);
+  })
+
+  renderProgram(gl, shaderProgram, modelArr)
+}

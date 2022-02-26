@@ -42,6 +42,7 @@ body {
 
 .models-pane {
   border: 0.1rem solid;
+  overflow-y: scroll;
 }
 
 .models-pane > ul {
