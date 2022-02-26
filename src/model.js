@@ -133,11 +133,13 @@ class Model {
     const colorInput = document.createElement('input');
     const colorLabel = document.createElement('label');
     const deleteButton = document.createElement('button');
+    const editButton = document.createElement('button');
 
     li1.innerHTML = `type: ${this.#type}`;
     li2.appendChild(colorLabel);
     li2.appendChild(colorInput);
     li3.appendChild(deleteButton);
+    li3.appendChild(editButton);
     ul.appendChild(li1);
     ul.appendChild(li2);
     ul.appendChild(li3);
@@ -163,6 +165,13 @@ class Model {
       const idx = modelArr.indexOf(this);
       modelArr.splice(idx, 1);
       renderProgram(gl, shaderProgram, modelArr);
+    });
+
+    editButton.innerHTML = 'edit';
+    editButton.id = `model-edit-${modelArr.length}`
+    editButton.addEventListener('click', () => {
+      this.changePoint(this.getTotalIndices()-1,0.5,0.5,this.getRawColor());
+      renderProgram(gl, shaderProgram, modelArr);       
     });
   }
 }
