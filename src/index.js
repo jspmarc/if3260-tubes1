@@ -6,26 +6,32 @@ var line = false;
 var modelArr = [];
 var isDrawing = false;
 var isShiftHeld = false;
+var canvasRatio = 0;
 
 main();
 
-// document.getElementById("glcanvas").addEventListener("click", printMousePos);
+document.getElementById("glcanvas").addEventListener("click", handleCanvasClick);
 document.getElementById("glcanvas").addEventListener("mousedown", startDrawing);
 document.getElementById("glcanvas").addEventListener("mousemove", drawing);
 document.getElementById("glcanvas").addEventListener("mouseup", finishDrawing);
 document.addEventListener('keydown', (e) => isShiftHeld = e.shiftKey);
 document.addEventListener('keyup', (e) => isShiftHeld = e.shiftKey);
+document.getElementById('vertex-count-picker').addEventListener('change', e => {
+  if (isNaN(+e.target.value) || +e.target.value <= 2)
+    e.target.value = 5;
+});
 
 //
 // FUNCTIONS
 //
 function main() {
   const canvas = document.querySelector('#glcanvas');
-  // Change here to resize canvas
+  // Change here to resize canvar
   canvas.style.width ='100%';
   canvas.style.height='100%';
   canvas.width  = canvas.offsetWidth;
   canvas.height = canvas.offsetHeight;
+  canvasRatio = canvas.clientWidth / canvas.clientHeight;
   gl = canvas.getContext('webgl');
 
   gl.clearColor(0.95, 0.90, 0.85, 0.9);
@@ -63,14 +69,8 @@ function main() {
   renderProgram(gl, shaderProgram, modelArr)
 }
 
-function printMousePos(event) {
-  console.log("clientX: " + event.clientX + " - clientY: " + event.clientY);
-  const coor = getCursorGlCoordinates(event);
-  console.log(coor);
-}
-
 function startDrawing(e) {
-  if (drawMode !== '') {
+  if (drawMode !== '' && drawMode.toLowerCase() !== 'polygon') {
     isDrawing = true;
     const color = document.getElementById('obj-color-picker').value;
 
@@ -89,7 +89,7 @@ function startDrawing(e) {
 }
 
 function drawing(e) {
-  if (isDrawing) {
+  if (isDrawing && drawMode.toLowerCase() !== 'polygon') {
     const model = modelArr[modelArr.length - 1];
     const coor = getCursorGlCoordinates(e);
     while (model.getCoordinates().length > 1) {
@@ -97,6 +97,7 @@ function drawing(e) {
     }
     switch (drawMode) {
       case 'line':
+      case 'polygon':
         model.addPoint(coor.x, coor.y);
         break;
       case 'square':
@@ -110,17 +111,30 @@ function drawing(e) {
             coor.x - model.getCoordinates()[0][0],
             coor.y - model.getCoordinates()[0][1],
           );
-          model.addPoint(model.getCoordinates()[0][0], model.getCoordinates()[0][1] - distanceToCursor);
-          model.addPoint(model.getCoordinates()[0][0] + distanceToCursor, model.getCoordinates()[0][1]);
-          model.addPoint(model.getCoordinates()[0][0] + distanceToCursor, model.getCoordinates()[0][1] - distanceToCursor);
+          const delta = {
+            x: distanceToCursor,
+            y: distanceToCursor * canvasRatio,
+          };
+          model.addPoint(model.getCoordinates()[0][0], model.getCoordinates()[0][1] - delta.y);
+          model.addPoint(model.getCoordinates()[0][0] + delta.x, model.getCoordinates()[0][1]);
+          model.addPoint(model.getCoordinates()[0][0] + delta.x, model.getCoordinates()[0][1] - delta.y);
         }
+        break;
     }
+    renderProgram(gl, shaderProgram, modelArr);
+  } else if (isDrawing && drawMode.toLowerCase() === 'polygon') {
+    const model = modelArr[modelArr.length - 1];
+    const coor = getCursorGlCoordinates(e);
+    if (model.getCoordinates().length > 1) {
+      model.popPoint();
+    }
+    model.addPoint(coor.x, coor.y);
     renderProgram(gl, shaderProgram, modelArr);
   }
 }
 
 function finishDrawing(e) {
-  if (isDrawing) {
+  if (isDrawing && drawMode.toLowerCase() !== 'polygon') {
     const model = modelArr[modelArr.length - 1];
     const coor = getCursorGlCoordinates(e);
     while (model.getCoordinates().length > 1) {
@@ -141,58 +155,53 @@ function finishDrawing(e) {
             coor.x - model.getCoordinates()[0][0],
             coor.y - model.getCoordinates()[0][1],
           );
-          model.addPoint(model.getCoordinates()[0][0], model.getCoordinates()[0][1] - distanceToCursor);
-          model.addPoint(model.getCoordinates()[0][0] + distanceToCursor, model.getCoordinates()[0][1]);
-          model.addPoint(model.getCoordinates()[0][0] + distanceToCursor, model.getCoordinates()[0][1] - distanceToCursor);
+          const delta = {
+            x: distanceToCursor,
+            y: distanceToCursor * canvasRatio,
+          };
+          model.addPoint(model.getCoordinates()[0][0], model.getCoordinates()[0][1] - delta.y);
+          model.addPoint(model.getCoordinates()[0][0] + delta.x, model.getCoordinates()[0][1]);
+          model.addPoint(model.getCoordinates()[0][0] + delta.x, model.getCoordinates()[0][1] - delta.y);
         }
+        break;
     }
 
     document.getElementById('glcanvas').classList.remove('cursor-draw');
     drawMode = ''
-
     renderProgram(gl, shaderProgram, modelArr);
-
-    // add entry to models pane
-    const pane = document.querySelector('.right.models-pane');
-    const ul = document.createElement('ul');
-    const li1 = document.createElement('li');
-    const li2 = document.createElement('li');
-    const li3 = document.createElement('li');
-    const colorInput = document.createElement('input');
-    const colorLabel = document.createElement('label');
-    const deleteButton = document.createElement('button');
-
-    li1.innerHTML = `type: ${model.getModelType()}`;
-    li2.appendChild(colorLabel);
-    li2.appendChild(colorInput);
-    li3.appendChild(deleteButton);
-    ul.appendChild(li1);
-    ul.appendChild(li2);
-    ul.appendChild(li3);
-    pane.appendChild(ul);
-
-    colorInput.type = 'color';
-    colorInput.name = `model-color-${modelArr.length}`
-    colorInput.classList.add('model-color');
-    colorInput.id = colorInput.name;
-    colorInput.value = model.getRawColor();
-    colorInput.model = model;
-    colorInput.addEventListener('change', e => {
-      model.changeColor(e.target.value);
-      renderProgram(gl, shaderProgram, modelArr);
-    });
-
-    colorLabel.htmlFor = colorInput.name;
-    colorLabel.innerHTML = 'color: ';
-
-    deleteButton.innerHTML = 'delete';
-    deleteButton.id = `model-delete-${modelArr.length}`
-    deleteButton.addEventListener('click', () => {
-      pane.removeChild(ul);
-      const idx = modelArr.indexOf(model);
-      modelArr.splice(idx, 1);
-      renderProgram(gl, shaderProgram, modelArr);
-    });
+    model.addToModelsPane();
+    isDrawing = false;
   }
-  isDrawing = false;
+}
+
+function handleCanvasClick(event) {
+  if (isDrawing || drawMode === 'polygon') {
+    let model;
+    if (!isDrawing) {
+      // first time
+      const color = document.getElementById('obj-color-picker').value;
+      model = new Model('LINE', color);
+      modelArr.push(model);
+    } else {
+      model = modelArr[modelArr.length - 1];
+    }
+    const vertexCountPicker = document.getElementById('vertex-count-picker');
+    const remainingVertices = +vertexCountPicker.value;
+    const coor = getCursorGlCoordinates(event);
+
+    model.addPoint(coor.x, coor.y);
+
+    if (remainingVertices === 1) {
+      isDrawing = false;
+      drawMode = '';
+      document.getElementById('glcanvas').classList.remove('cursor-draw');
+      vertexCountPicker.value = 5;
+      model.addToModelsPane();
+      model.changeType('POLYGON');
+    } else {
+      isDrawing = true;
+      vertexCountPicker.value = remainingVertices - 1;
+    }
+    renderProgram(gl, shaderProgram, modelArr);
+  }
 }

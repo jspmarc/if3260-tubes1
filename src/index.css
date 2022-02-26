@@ -13,7 +13,7 @@ body {
 
 .canvas-body {
   height: min(var(--canvas-height), calc(100vw - var(--right-pane-width) - var(--left-pane-width)));
-  width: min(var(--canvas-height), calc(100vw - var(--right-pane-width) - var(--left-pane-width)));
+  width: calc(100vw - var(--right-pane-width) - var(--left-pane-width));
   display: flex;
   justify-content: center;
   align-items: center;
@@ -49,4 +49,12 @@ body {
   list-style: none;
   margin: 0.5rem;
   padding: 1rem;
+}
+
+.tools-pane > .polygon {
+  border: 0.1rem dashed;
+  display: flex;
+  flex-direction: column;
+  padding: 0.1rem;
+  width: var(--left-pane-width);
 }

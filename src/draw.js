@@ -92,12 +92,16 @@ function renderProgram(gl, shaderProgram, models) {
   var offset = 0;
   models.forEach(model => {
     var totalIndices = model.getTotalIndices();
+    let drawMode;
 
     if (model.getModelType() === 'LINE') {
-      gl.drawElements(gl.LINE_LOOP, totalIndices, gl.UNSIGNED_SHORT, 2 * offset);
+      drawMode = gl.LINE_LOOP;
+    } else if (model.getModelType() === 'POLYGON') {
+      drawMode = gl.TRIANGLE_FAN;
     } else {
-      gl.drawElements(gl.TRIANGLE_STRIP, totalIndices, gl.UNSIGNED_SHORT, 2 * offset);
+      drawMode = gl.TRIANGLE_STRIP;
     }
+    gl.drawElements(drawMode, totalIndices, gl.UNSIGNED_SHORT, 2 * offset);
 
     offset += totalIndices;
   });

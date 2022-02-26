@@ -10,7 +10,11 @@
     <div class="left tools-pane">
       <button onclick="drawObject('line')">Line</button>
       <button onclick="drawObject('rectangle')">Rectangle</button>
-      <button onclick="drawObject('polygon')">Polygon</button>
+      <div class="polygon">
+        <button onclick="drawObject('polygon')">Polygon</button>
+        <label for="number">Polygon vertex count:</label>
+        <input id="vertex-count-picker" type="number" name="number" value="5" min="3">
+      </div>
       <input class="color" type="color" id="obj-color-picker" name="color" value="#000000">
     </div>
     <div class="canvas-body">

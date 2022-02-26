@@ -122,4 +122,47 @@ class Model {
       this.#colors[i] = color;
     }
   }
+
+  addToModelsPane() {
+    // add entry to models pane
+    const pane = document.querySelector('.right.models-pane');
+    const ul = document.createElement('ul');
+    const li1 = document.createElement('li');
+    const li2 = document.createElement('li');
+    const li3 = document.createElement('li');
+    const colorInput = document.createElement('input');
+    const colorLabel = document.createElement('label');
+    const deleteButton = document.createElement('button');
+
+    li1.innerHTML = `type: ${this.#type}`;
+    li2.appendChild(colorLabel);
+    li2.appendChild(colorInput);
+    li3.appendChild(deleteButton);
+    ul.appendChild(li1);
+    ul.appendChild(li2);
+    ul.appendChild(li3);
+    pane.appendChild(ul);
+
+    colorInput.type = 'color';
+    colorInput.name = `model-color-${modelArr.length}`
+    colorInput.classList.add('model-color');
+    colorInput.id = colorInput.name;
+    colorInput.value = this.#colorRaw;
+    colorInput.addEventListener('change', e => {
+      this.changeColor(e.target.value);
+      renderProgram(gl, shaderProgram, modelArr);
+    });
+
+    colorLabel.htmlFor = colorInput.name;
+    colorLabel.innerHTML = 'color: ';
+
+    deleteButton.innerHTML = 'delete';
+    deleteButton.id = `model-delete-${modelArr.length}`
+    deleteButton.addEventListener('click', () => {
+      pane.removeChild(ul);
+      const idx = modelArr.indexOf(this);
+      modelArr.splice(idx, 1);
+      renderProgram(gl, shaderProgram, modelArr);
+    });
+  }
 }
