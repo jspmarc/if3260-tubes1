@@ -35,7 +35,7 @@ function hexToColorArray(hex) {
  * @param {Event} e an event on the canvas HTML object
 * @returns {{x: number, y: number}} 
  */
-function getGlCoordinates(e) {
+function getCursorGlCoordinates(e) {
   const canvas = e.target;
   const rect = canvas.getBoundingClientRect();
   const scale = {

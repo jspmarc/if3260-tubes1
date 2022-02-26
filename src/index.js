@@ -65,7 +65,7 @@ function main() {
 
 function printMousePos(event) {
   console.log("clientX: " + event.clientX + " - clientY: " + event.clientY);
-  const coor = getGlCoordinates(event);
+  const coor = getCursorGlCoordinates(event);
   console.log(coor);
 }
 
@@ -76,7 +76,7 @@ function startDrawing(e) {
 
     const model = new Model(drawMode.toUpperCase(), color);
     modelArr.push(model);
-    const coor = getGlCoordinates(e);
+    const coor = getCursorGlCoordinates(e);
     switch (drawMode) {
       case 'line':
       case 'square':
@@ -91,19 +91,16 @@ function startDrawing(e) {
 function drawing(e) {
   if (isDrawing) {
     const model = modelArr[modelArr.length - 1];
-    const coor = getGlCoordinates(e);
+    const coor = getCursorGlCoordinates(e);
+    while (model.getCoordinates().length > 1) {
+      model.popPoint();
+    }
     switch (drawMode) {
       case 'line':
-        while (model.getCoordinates().length >= 2) {
-          model.popPoint();
-        }
         model.addPoint(coor.x, coor.y);
         break;
       case 'square':
       case 'rectangle':
-        while (model.getCoordinates().length > 1) {
-          model.popPoint();
-        }
         if (!isShiftHeld) {
           model.addPoint(model.getCoordinates()[0][0], coor.y);
           model.addPoint(coor.x, model.getCoordinates()[0][1]);
@@ -125,19 +122,16 @@ function drawing(e) {
 function finishDrawing(e) {
   if (isDrawing) {
     const model = modelArr[modelArr.length - 1];
-    const coor = getGlCoordinates(e);
+    const coor = getCursorGlCoordinates(e);
+    while (model.getCoordinates().length > 1) {
+      model.popPoint();
+    }
     switch (drawMode) {
       case 'line':
-        while (model.getCoordinates().length >= 2) {
-          model.popPoint();
-        }
         model.addPoint(coor.x, coor.y);
         break;
       case 'square':
       case 'rectangle':
-        while (model.getCoordinates().length > 1) {
-          model.popPoint();
-        }
         if (!isShiftHeld) {
           model.addPoint(model.getCoordinates()[0][0], coor.y);
           model.addPoint(coor.x, model.getCoordinates()[0][1]);
