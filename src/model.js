@@ -3,19 +3,21 @@ var indices = [];
 class Model {
   #coordinates = [];
   #colors = [];
+  #colorRaw = '';
   #type = "SQUARE";
 
-  constructor(type="SQUARE") {
+  constructor(type="SQUARE", colorRaw='#000000') {
     this.#type = type;
+    this.#colorRaw = colorRaw;
   }
 
   /**
    * Add a point to the model
    * @param {number} x 
    * @param {number} y 
-   * @param {Array<number>} color 
    */
-  addPoint(x, y, color=[0,0,0]) {
+  addPoint(x, y) {
+    const color = hexToColorArray(this.#colorRaw);
     this.#coordinates.push([x,y,0]);
     this.#colors.push(color);
 
@@ -106,12 +108,18 @@ class Model {
     }
   }
 
+  getRawColor() {
+    return this.#colorRaw;
+  }
+
   /**
-   * @param {Array<number>} newColor 
+   * @param {string} newColor hex value of new color
    */
   changeColor(newColor) {
+    this.#colorRaw = newColor;
+    const color = hexToColorArray(newColor);
     for (let i = 0; i < this.#colors.length; ++i) {
-      this.#colors[i] = newColor;
+      this.#colors[i] = color;
     }
   }
 }

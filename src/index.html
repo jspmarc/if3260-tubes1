@@ -6,18 +6,18 @@
 		<link rel="stylesheet" href="./index.css" type="text/css">
 	</head>
 
-	<body>
-		<div class="canvas-body" style="width: 100vw; height: 100vh;">
-			<canvas id="glcanvas"></canvas>
-		</div>
-		<div class="top-left tools-pane">
-			<button class="change" onclick="modifyPoint()">Change</button>
-			<button class="line" onclick="drawLine">Line</button>
-			<button class="delete" onclick="removeAPoint(0)">Delete</button>
-			<button class="new" onclick="addNewModel()">New</button>
-      <label for="color">Color</label>
+	<body class="main">
+    <div class="left tools-pane">
+      <button class="line" onclick="drawLine">Line</button>
+      <button onclick="drawLine">Rectangle</button>
+      <button onclick="drawLine">Polygon</button>
       <input class="color" type="color" id="obj-color-picker" name="color" value="#000000">
-		</div>
+    </div>
+    <div class="canvas-body">
+      <canvas id="glcanvas"></canvas>
+    </div>
+    <div class="right models-pane">
+    </div>
 	</body>
 
 	<script src="http://cdn.jsdelivr.net/glmatrix/2.2.0/gl-matrix.js"></script>

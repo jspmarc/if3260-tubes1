@@ -8,11 +8,14 @@ var isDrawing = false;
 
 main();
 
-document.getElementById('obj-color-picker').addEventListener('change', colorChangeListener);
 document.querySelector('.tools-pane > .line').addEventListener('click', drawLine);
+// document.getElementById("glcanvas").addEventListener("click", printMousePos);
+document.getElementById("glcanvas").addEventListener("mousedown", startDrawing);
+document.getElementById("glcanvas").addEventListener("mousemove", drawing);
+document.getElementById("glcanvas").addEventListener("mouseup", finishDrawing);
 
 //
-// Start here
+// FUNCTIONS
 //
 function main() {
   const canvas = document.querySelector('#glcanvas');
@@ -65,14 +68,14 @@ function printMousePos(event) {
 function startDrawing(e) {
   if (drawMode !== '') {
     isDrawing = true;
-    const color = hexToColorArray(document.getElementById('obj-color-picker').value);
+    const color = document.getElementById('obj-color-picker').value;
 
-    const model = new Model(drawMode.toUpperCase());
+    const model = new Model(drawMode.toUpperCase(), color);
     modelArr.push(model);
     const coor = getGlCoordinates(e);
     switch (drawMode) {
       case 'line':
-        model.addPoint(coor.x, coor.y, color);
+        model.addPoint(coor.x, coor.y);
     }
     renderProgram(gl, shaderProgram, modelArr);
   }
@@ -95,7 +98,6 @@ function drawing(e) {
 
 function finishDrawing(e) {
   if (isDrawing) {
-    const color = hexToColorArray(document.getElementById('obj-color-picker').value);
     const model = modelArr[modelArr.length - 1];
     const coor = getGlCoordinates(e);
     switch (drawMode) {
@@ -103,20 +105,42 @@ function finishDrawing(e) {
         while (model.getCoordinates().length >= 2) {
           model.popPoint();
         }
-        model.addPoint(coor.x, coor.y, color);
+        model.addPoint(coor.x, coor.y);
     }
 
     document.getElementById('glcanvas').classList.remove('cursor-draw');
     drawMode = ''
 
-    console.log(model);
     renderProgram(gl, shaderProgram, modelArr);
+
+    // add entry to models pane
+    const pane = document.querySelector('.right.models-pane');
+    const ul = document.createElement('ul');
+    const li1 = document.createElement('li');
+    const li2 = document.createElement('li');
+    const colorInput = document.createElement('input');
+    const colorLabel = document.createElement('label');
+
+    li1.innerHTML = `type: ${model.getModelType()}`;
+    li2.appendChild(colorLabel);
+    li2.appendChild(colorInput);
+    ul.appendChild(li1);
+    ul.appendChild(li2);
+    pane.appendChild(ul);
+
+    colorInput.type = 'color';
+    colorInput.name = `model-color-${modelArr.length}`
+    colorInput.classList.add('model-color');
+    colorInput.id = colorInput.name;
+    colorInput.value = model.getRawColor();
+    colorInput.model = model;
+    colorInput.addEventListener('change', e => {
+      model.changeColor(e.target.value);
+      renderProgram(gl, shaderProgram, modelArr);
+    });
+
+    colorLabel.htmlFor = colorInput.name;
+    colorLabel.innerHTML = 'color: '
   }
   isDrawing = false;
 }
-
-// document.getElementById("glcanvas").addEventListener("click", printMousePos);
-document.getElementById("glcanvas").addEventListener("mousedown", startDrawing);
-document.getElementById("glcanvas").addEventListener("mousemove", drawing);
-document.getElementById("glcanvas").addEventListener("mouseup", finishDrawing);
-
