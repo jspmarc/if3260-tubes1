@@ -54,6 +54,19 @@ function getCursorGlCoordinates(e) {
   return coor;
 }
 
+function drawExample() {
+  input.forEach(input => {
+    const modelObj = new Model(input.type, input.color);
+    input.coordinates.forEach(coordinate => {
+      modelObj.addPoint(coordinate[0], coordinate[1]);
+    })
+    modelObj.addToModelsPane();
+    modelArr.push(modelObj);
+  })
+
+  renderProgram(gl, shaderProgram, modelArr)
+}
+
 /**
  * Draw STEI Logo using WebGL
  */
@@ -67,6 +80,18 @@ function drawSTEILogo() {
     modelObj.addToModelsPane();
     modelArr.push(modelObj);
   })
+
+  renderProgram(gl, shaderProgram, modelArr)
+}
+
+/**
+ * Reset the canvas
+ */
+function resetCanvas() {
+  modelArr = [];
+
+  const pane = document.querySelector('.right.models-pane');
+  pane.innerHTML = "";
 
   renderProgram(gl, shaderProgram, modelArr)
 }

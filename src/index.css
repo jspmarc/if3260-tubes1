@@ -59,3 +59,7 @@ body {
   padding: 0.1rem;
   width: var(--left-pane-width);
 }
+
+.tools-pane-text {
+  margin-top: 20px;
+}
