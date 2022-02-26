@@ -7,28 +7,10 @@ function modifyPoint() {
   renderProgram(gl, shaderProgram, modelArr)
 }
 
-function drawLine(e) {
-  line = !line;
-  // model.changeType(line ? 'LINE' : 'SQUARE')
+function drawObject(mode) {
   document.getElementById('glcanvas').classList.add('cursor-draw');
   selectDrawTool = true;
-  drawMode = 'line';
-
-  renderProgram(gl, shaderProgram, modelArr)
-}
-
-function drawRectangle(e) {
-  line = !line;
-  model.changeType(line ? 'LINE' : 'SQUARE')
-  printMousePos(e);
-
-  renderProgram(gl, shaderProgram, modelArr)
-}
-
-function drawPolygon(e) {
-  line = !line;
-  model.changeType(line ? 'LINE' : 'SQUARE')
-  printMousePos(e);
+  drawMode = mode;
 
   renderProgram(gl, shaderProgram, modelArr)
 }

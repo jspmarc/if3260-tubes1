@@ -5,14 +5,16 @@ var reset = false;
 var line = false;
 var modelArr = [];
 var isDrawing = false;
+var isShiftHeld = false;
 
 main();
 
-document.querySelector('.tools-pane > .line').addEventListener('click', drawLine);
-// document.getElementById("glcanvas").addEventListener("click", printMousePos);
+document.getElementById("glcanvas").addEventListener("click", printMousePos);
 document.getElementById("glcanvas").addEventListener("mousedown", startDrawing);
 document.getElementById("glcanvas").addEventListener("mousemove", drawing);
 document.getElementById("glcanvas").addEventListener("mouseup", finishDrawing);
+document.addEventListener('keydown', (e) => isShiftHeld = e.shiftKey);
+document.addEventListener('keyup', (e) => isShiftHeld = e.shiftKey);
 
 //
 // FUNCTIONS
@@ -63,6 +65,8 @@ function main() {
 
 function printMousePos(event) {
   console.log("clientX: " + event.clientX + " - clientY: " + event.clientY);
+  const coor = getGlCoordinates(event);
+  console.log(coor);
 }
 
 function startDrawing(e) {
@@ -75,7 +79,10 @@ function startDrawing(e) {
     const coor = getGlCoordinates(e);
     switch (drawMode) {
       case 'line':
+      case 'square':
+      case 'rectangle':
         model.addPoint(coor.x, coor.y);
+        break;
     }
     renderProgram(gl, shaderProgram, modelArr);
   }
@@ -91,6 +98,25 @@ function drawing(e) {
           model.popPoint();
         }
         model.addPoint(coor.x, coor.y);
+        break;
+      case 'square':
+      case 'rectangle':
+        while (model.getCoordinates().length > 1) {
+          model.popPoint();
+        }
+        if (!isShiftHeld) {
+          model.addPoint(model.getCoordinates()[0][0], coor.y);
+          model.addPoint(coor.x, model.getCoordinates()[0][1]);
+          model.addPoint(coor.x, coor.y);
+        } else {
+          const distanceToCursor = Math.max(
+            coor.x - model.getCoordinates()[0][0],
+            coor.y - model.getCoordinates()[0][1],
+          );
+          model.addPoint(model.getCoordinates()[0][0], model.getCoordinates()[0][1] - distanceToCursor);
+          model.addPoint(model.getCoordinates()[0][0] + distanceToCursor, model.getCoordinates()[0][1]);
+          model.addPoint(model.getCoordinates()[0][0] + distanceToCursor, model.getCoordinates()[0][1] - distanceToCursor);
+        }
     }
     renderProgram(gl, shaderProgram, modelArr);
   }
@@ -106,12 +132,32 @@ function finishDrawing(e) {
           model.popPoint();
         }
         model.addPoint(coor.x, coor.y);
+        break;
+      case 'square':
+      case 'rectangle':
+        while (model.getCoordinates().length > 1) {
+          model.popPoint();
+        }
+        if (!isShiftHeld) {
+          model.addPoint(model.getCoordinates()[0][0], coor.y);
+          model.addPoint(coor.x, model.getCoordinates()[0][1]);
+          model.addPoint(coor.x, coor.y);
+        } else {
+          const distanceToCursor = Math.max(
+            coor.x - model.getCoordinates()[0][0],
+            coor.y - model.getCoordinates()[0][1],
+          );
+          model.addPoint(model.getCoordinates()[0][0], model.getCoordinates()[0][1] - distanceToCursor);
+          model.addPoint(model.getCoordinates()[0][0] + distanceToCursor, model.getCoordinates()[0][1]);
+          model.addPoint(model.getCoordinates()[0][0] + distanceToCursor, model.getCoordinates()[0][1] - distanceToCursor);
+        }
     }
 
     document.getElementById('glcanvas').classList.remove('cursor-draw');
     drawMode = ''
 
     renderProgram(gl, shaderProgram, modelArr);
+    console.log(model);
 
     // add entry to models pane
     const pane = document.querySelector('.right.models-pane');

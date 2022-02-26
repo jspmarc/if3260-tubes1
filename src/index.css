@@ -1,6 +1,7 @@
 :root {
   --left-pane-width: 8rem;
   --right-pane-width: 12rem;
+  --canvas-height: 100vh;
 }
 
 body {
@@ -11,8 +12,8 @@ body {
 }
 
 .canvas-body {
-  height: 100vh;
-  width: calc(100vw - var(--right-pane-width) - var(--left-pane-width));
+  height: min(var(--canvas-height), calc(100vw - var(--right-pane-width) - var(--left-pane-width)));
+  width: min(var(--canvas-height), calc(100vw - var(--right-pane-width) - var(--left-pane-width)));
   display: flex;
   justify-content: center;
   align-items: center;

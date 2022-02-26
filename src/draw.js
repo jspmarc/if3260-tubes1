@@ -96,7 +96,7 @@ function renderProgram(gl, shaderProgram, models) {
     if (model.getModelType() === 'LINE') {
       gl.drawElements(gl.LINE_LOOP, totalIndices, gl.UNSIGNED_SHORT, 2 * offset);
     } else {
-      gl.drawElements(gl.TRIANGLE_FAN, totalIndices, gl.UNSIGNED_SHORT, 2 * offset);
+      gl.drawElements(gl.TRIANGLE_STRIP, totalIndices, gl.UNSIGNED_SHORT, 2 * offset);
     }
 
     offset += totalIndices;
