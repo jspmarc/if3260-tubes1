@@ -55,6 +55,8 @@ function getCursorGlCoordinates(e) {
 }
 
 function drawExample() {
+  resetCanvas();
+  
   input.forEach(input => {
     const modelObj = new Model(input.type, input.color);
     input.coordinates.forEach(coordinate => {
@@ -71,6 +73,8 @@ function drawExample() {
  * Draw STEI Logo using WebGL
  */
 function drawSTEILogo() {
+  resetCanvas();
+
   ModelData.forEach(model => {
     const modelObj = new Model();
     model.coordinates.forEach(coordinate => {
