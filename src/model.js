@@ -170,8 +170,18 @@ class Model {
     editButton.innerHTML = 'edit';
     editButton.id = `model-edit-${modelArr.length}`
     editButton.addEventListener('click', () => {
-      this.changePoint(this.getTotalIndices()-1,0.5,0.5,this.getRawColor());
-      renderProgram(gl, shaderProgram, modelArr);       
+      isEditing = true;
+      document.getElementById('glcanvas').classList.add('cursor-draw');
+      console.log(this.#type);
+      document.getElementById("glcanvas").addEventListener("click", (e) => {
+        if (isEditing){
+          const coor = getCursorGlCoordinates(e);
+          this.changePoint(this.getTotalIndices()-1,coor.x,coor.y);
+          isEditing = false;
+          document.getElementById('glcanvas').classList.remove('cursor-draw');
+        }
+        renderProgram(gl, shaderProgram, modelArr);
+      });
     });
   }
 }

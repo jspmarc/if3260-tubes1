@@ -5,6 +5,7 @@ var reset = false;
 var line = false;
 var modelArr = [];
 var isDrawing = false;
+var isEditing = false;
 var isShiftHeld = false;
 var canvasRatio = 0;
 
