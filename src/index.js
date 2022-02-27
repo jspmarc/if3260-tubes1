@@ -197,8 +197,8 @@ function handleCanvasClick(event) {
       drawMode = '';
       document.getElementById('glcanvas').classList.remove('cursor-draw');
       vertexCountPicker.value = 5;
-      model.addToModelsPane();
       model.changeType('POLYGON');
+      model.addToModelsPane();
     } else {
       isDrawing = true;
       vertexCountPicker.value = remainingVertices - 1;
