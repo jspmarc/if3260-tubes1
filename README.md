@@ -1,7 +1,8 @@
 # IF3260 - Tubes 1
 
 ## Dokumentasi
-- [Laporan](https://docs.google.com/document/d/1ITMEXbXDcePWNITuzQ2l817zM9Xuq9CXVEzxUlOnbQU/edit#)
+- [Laporan](./laporan.pdf)
+- [Laporan (alternatif, link ke GDocs)](https://docs.google.com/document/d/1ITMEXbXDcePWNITuzQ2l817zM9Xuq9CXVEzxUlOnbQU)
 
 ## Requirement
 
