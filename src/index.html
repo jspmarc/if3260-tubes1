@@ -8,18 +8,22 @@
 
 	<body class="main">
     <div class="left tools-pane">
-      <button onclick="drawObject('line')">Line</button>
-      <button onclick="drawObject('rectangle')">Rectangle</button>
+      <button id="line-tool" onclick="drawObject('line')">Line</button>
+      <button id="rectangle-tool" onclick="drawObject('rectangle')">Rectangle</button>
       <div class="polygon">
-        <button onclick="drawObject('polygon')">Polygon</button>
-        <label for="number">Polygon vertex count:</label>
+        <button id="polygon-tool" onclick="drawObject('polygon')">Polygon</button>
+        <label id="vertex-count-picker-label" for="number">Polygon vertex count:</label>
         <input id="vertex-count-picker" type="number" name="number" value="5" min="3">
       </div>
-      <button onclick="resetCanvas()">Reset</button>
+      <button id="reset-tool" onclick="resetCanvas()">Reset</button>
       <input class="color" type="color" id="obj-color-picker" name="color" value="#000000">
       <div class="tools-pane-text">Input Drawing</div class="tools-pane-text">
-      <button onclick="drawExample()">Contoh Denah</button>
-      <button onclick="drawSTEILogo()">Logo STEI</button>
+      <button id="example-1-tool" onclick="drawExample()">Contoh Denah</button>
+      <button id="example-2-tool" onclick="drawSTEILogo()">Logo STEI</button>
+      <div id="help">
+        <h1>Help</h1>
+        <span>Please hover on one of the tools to get help.</span>
+      </div>
     </div>
     <div class="canvas-body">
       <canvas id="glcanvas"></canvas>
@@ -33,6 +37,7 @@
 	<script src="./model.js"></script>
 	<script src="./draw.js"></script>
 	<script src="./helper.js"></script>
+	<script src="./help-texts.js"></script>
   <script src="../test/LogoSTEI.js"></script>
   <script src="../test/input.js"></script>
 	<script src="./index.js"></script>
