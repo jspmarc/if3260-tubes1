@@ -184,4 +184,12 @@ class Model {
       });
     });
   }
+
+  toObject() {
+    return {
+      type: this.#type,
+      color: this.#colorRaw,
+      coordinates: this.#coordinates,
+    }
+  }
 }

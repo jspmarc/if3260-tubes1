@@ -42,7 +42,7 @@ body {
 
 .models-pane {
   border: 0.1rem solid;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .models-pane > ul {
@@ -51,6 +51,7 @@ body {
   margin: 0.5rem;
   padding: 1rem;
 }
+
 
 .tools-pane > .polygon {
   border: 0.1rem dashed;

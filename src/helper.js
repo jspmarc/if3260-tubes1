@@ -54,19 +54,31 @@ function getCursorGlCoordinates(e) {
   return coor;
 }
 
-function drawExample() {
+/**
+ * Draw an input file
+ * @param {File} input 
+ */
+function drawInput(input) {
   resetCanvas();
-  
-  input.forEach(input => {
-    const modelObj = new Model(input.type, input.color);
-    input.coordinates.forEach(coordinate => {
-      modelObj.addPoint(coordinate[0], coordinate[1]);
-    })
-    modelObj.addToModelsPane();
-    modelArr.push(modelObj);
-  })
 
-  renderProgram(gl, shaderProgram, modelArr)
+  let reader = new FileReader();
+  reader.onload = function(e) {
+    var content = e.target.result;
+    var data = JSON.parse(content); // parse json 
+
+    data.forEach(input => {
+      const modelObj = new Model(input.type, input.color);
+      input.coordinates.forEach(coordinate => {
+        modelObj.addPoint(coordinate[0], coordinate[1]);
+      })
+      modelObj.addToModelsPane();
+      modelArr.push(modelObj);
+    })
+  
+    renderProgram(gl, shaderProgram, modelArr)
+  }
+
+  reader.readAsText(input);
 }
 
 /**
@@ -98,4 +110,21 @@ function resetCanvas() {
   pane.innerHTML = "";
 
   renderProgram(gl, shaderProgram, modelArr)
+}
+
+function download() {
+  if (modelArr.length === 0) return;
+
+  var data = JSON.stringify(modelArr.map(model => model.toObject()))
+
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(data));
+  element.setAttribute('download', "model.json");
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
 }

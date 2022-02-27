@@ -32,6 +32,9 @@ document.getElementById('obj-color-picker').addEventListener('mouseover', () => 
 document.getElementById('example-1-tool').addEventListener('mouseover', () => {
   helpPane.innerHTML = `Example drawing`;
 });
-document.getElementById('example-2-tool').addEventListener('mouseover', () => {
-  helpPane.innerHTML = `Example drawing`;
+document.getElementById('file-input-tool').addEventListener('mouseover', () => {
+  helpPane.innerHTML = `A tool to import a model from a JSON file. See 'input-example.json' for structure example.`;
+});
+document.getElementById('download-btn').addEventListener('mouseover', () => {
+  helpPane.innerHTML = `Download current model as a JSON file. Downloaded file will be named 'model.json'.`;
 });
