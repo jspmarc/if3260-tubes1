@@ -4,6 +4,7 @@ var shaderProgram;
 var reset = false;
 var line = false;
 var modelArr = [];
+var editingModel = '';
 var isDrawing = false;
 var isEditing = false;
 var isShiftHeld = false;
@@ -16,7 +17,9 @@ document
   .addEventListener("click", handleCanvasClick);
 document.getElementById("glcanvas").addEventListener("mousedown", startDrawing);
 document.getElementById("glcanvas").addEventListener("mousemove", drawing);
+document.getElementById("glcanvas").addEventListener("mousemove", editing);
 document.getElementById("glcanvas").addEventListener("mouseup", finishDrawing);
+document.getElementById("glcanvas").addEventListener("mouseup", finishEditing);
 document.addEventListener("keydown", (e) => (isShiftHeld = e.shiftKey));
 document.addEventListener("keyup", (e) => (isShiftHeld = e.shiftKey));
 document
@@ -227,6 +230,77 @@ function handleCanvasClick(event) {
       vertexCountPicker.value = remainingVertices - 1;
     }
     renderProgram(gl, shaderProgram, modelArr);
+  }
+}
+
+function editing(e) {
+  if (isEditing && editingModel !== '') {
+    const model = editingModel;
+    const newCoor = getCursorGlCoordinates(e);
+    switch (model.getModelType()) {
+      case 'LINE':
+        model.changePoint(1,newCoor.x,newCoor.y);
+        break;
+      case 'SQUARE':
+      case 'RECTANGLE':
+        if (!isShiftHeld) {
+          model.changePoint(model.getTotalIndices()-3,model.getCoordinates()[0][0],newCoor.y);
+          model.changePoint(model.getTotalIndices()-2,newCoor.x,model.getCoordinates()[0][1]);
+          model.changePoint(model.getTotalIndices()-1,newCoor.x,newCoor.y);
+        } else {
+          const distanceToCursor = Math.max(
+            newCoor.x - model.getCoordinates()[0][0],
+            newCoor.y - model.getCoordinates()[0][1],
+          );
+          const delta = {
+            x: distanceToCursor,
+            y: distanceToCursor * canvasRatio,
+          };
+          model.changePoint(model.getTotalIndices()-3,model.getCoordinates()[0][0], model.getCoordinates()[0][1] - delta.y);
+          model.changePoint(model.getTotalIndices()-2,model.getCoordinates()[0][0] + delta.x, model.getCoordinates()[0][1]);
+          model.changePoint(model.getTotalIndices()-1,model.getCoordinates()[0][0] + delta.x, model.getCoordinates()[0][1] - delta.y);
+        }
+        break;
+    }
+    renderProgram(gl, shaderProgram, modelArr);
+  }
+}
+
+function finishEditing(e) {
+  if (isEditing && editingModel !== '') {
+    const model = editingModel;
+    const newCoor = getCursorGlCoordinates(e);
+    switch (model.getModelType()) {
+      case 'LINE':
+        model.changePoint(1,newCoor.x,newCoor.y);
+        break;
+      case 'SQUARE':
+      case 'RECTANGLE':
+        if (!isShiftHeld) {
+          model.changePoint(model.getTotalIndices()-3,model.getCoordinates()[0][0],newCoor.y);
+          model.changePoint(model.getTotalIndices()-2,newCoor.x,model.getCoordinates()[0][1]);
+          model.changePoint(model.getTotalIndices()-1,newCoor.x,newCoor.y);
+        } else {
+          const distanceToCursor = Math.max(
+            newCoor.x - model.getCoordinates()[0][0],
+            newCoor.y - model.getCoordinates()[0][1],
+          );
+          const delta = {
+            x: distanceToCursor,
+            y: distanceToCursor * canvasRatio,
+          };
+          model.changePoint(model.getTotalIndices()-3,model.getCoordinates()[0][0], model.getCoordinates()[0][1] - delta.y);
+          model.changePoint(model.getTotalIndices()-2,model.getCoordinates()[0][0] + delta.x, model.getCoordinates()[0][1]);
+          model.changePoint(model.getTotalIndices()-1,model.getCoordinates()[0][0] + delta.x, model.getCoordinates()[0][1] - delta.y);
+        }
+        break;
+    }
+    renderProgram(gl, shaderProgram, modelArr);
+
+    document.getElementById('glcanvas').classList.remove('cursor-draw');
+    editingModel = ''
+    renderProgram(gl, shaderProgram, modelArr);
+    isEditing = false;
   }
 }
 

@@ -171,17 +171,9 @@ class Model {
     editButton.id = `model-edit-${modelArr.length}`
     editButton.addEventListener('click', () => {
       isEditing = true;
+      editingModel = this;
       document.getElementById('glcanvas').classList.add('cursor-draw');
       console.log(this.#type);
-      document.getElementById("glcanvas").addEventListener("click", (e) => {
-        if (isEditing){
-          const coor = getCursorGlCoordinates(e);
-          this.changePoint(this.getTotalIndices()-1,coor.x,coor.y);
-          isEditing = false;
-          document.getElementById('glcanvas').classList.remove('cursor-draw');
-        }
-        renderProgram(gl, shaderProgram, modelArr);
-      });
     });
   }
 
