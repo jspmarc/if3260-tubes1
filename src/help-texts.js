@@ -1,16 +1,16 @@
 const helpPane = document.querySelector('.tools-pane > #help > span');
 // const originalText = helpPane.innerHTML;
 document.getElementById('line-tool').addEventListener('mouseover', () => {
-  helpPane.innerHTML = `A tool to be used to draw a line.
-To use this tool, <b>press and hold your primary mouse button</b> on the canvas to draw a line.`;
+  helpPane.innerHTML = `A tool to draw a line.
+To use this tool, <b>click and drag and hold your primary mouse button</b> on the canvas to draw a line.`;
 });
 document.getElementById('rectangle-tool').addEventListener('mouseover', () => {
-  helpPane.innerHTML = `A tool to be used to draw a rectangle or square.
-To use this tool, <b>press and hold your primary mouse button</b> on the canvas to draw a rectangle.
+  helpPane.innerHTML = `A tool to draw a rectangle or square.
+To use this tool, <b>click and drag your primary mouse button</b> on the canvas to draw a rectangle.
 Do the same while <b>pressing and holding shift</b> to draw a square.`;
 });
 document.getElementById('polygon-tool').addEventListener('mouseover', () => {
-  helpPane.innerHTML = `A tool to be used to draw a polygon.
+  helpPane.innerHTML = `A tool to draw a polygon.
 To use this tool, first edit the amount of vertices (defaults to 5, minimum of 3).
 And then, <b>click your primary mouse button</b> on the canvas to start drawing the polygon.
 `;
